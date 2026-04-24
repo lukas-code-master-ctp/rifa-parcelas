@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>#QuieroMiParcela — Compra tu e-book y gana una parcela</title>
+  <meta name="description" content="Compra nuestros e-books y participa por una de las parcelas que vamos a regalar. Mientras más e-books se vendan, más parcelas regalaremos." />
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="Logos/Favicon.png" />
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;500;600;700&family=Rubik:wght@400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind CSS CDN — config must come AFTER the script -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary:    '#23cb69',
+            secondary:  '#1aaa55',
+            cta:        '#000000',
+            'cta-dark': '#222222',
+            accent:     '#e8faf2',
+            cream:      '#ffffff',
+            'text-dark':'#000000',
+          },
+          fontFamily: {
+            heading: ['Rubik', 'sans-serif'],
+            body:    ['Nunito Sans', 'sans-serif'],
+          },
+        },
+      },
+    };
+  </script>
+
+  <!-- Alpine.js -->
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="assets/css/custom.css" />
+
+  <!-- Config -->
+  <script src="assets/js/config.js"></script>
+
+  <style>
+    body { font-family: 'Nunito Sans', sans-serif; background-color: #ffffff; color: #000000; }
+    h1,h2,h3,h4,h5 { font-family: 'Rubik', sans-serif; }
+  </style>
+</head>
+<body
+  x-data="app()"
+  x-init="init()"
+  class="bg-cream text-text-dark antialiased"
+>
+
+<!-- ============================================================
+     CART SIDEBAR OVERLAY
+     ============================================================ -->
+<div
+  x-show="$store.cart.open"
+  x-transition:enter="transition-opacity duration-300"
+  x-transition:enter-start="opacity-0"
+  x-transition:enter-end="opacity-100"
+  x-transition:leave="transition-opacity duration-300"
+  x-transition:leave-start="opacity-100"
+  x-transition:leave-end="opacity-0"
+  @click="$store.cart.open = false"
+  class="fixed inset-0 bg-black/40 z-40 modal-backdrop"
+  style="display:none"
+></div>
+
+<!-- Cart Drawer -->
+<aside
+  class="fixed top-0 right-0 h-full w-full sm:w-96 bg-white z-50 shadow-2xl flex flex-col cart-drawer"
+  :class="$store.cart.open ? 'translate-x-0' : 'translate-x-full'"
+  style="transform: translateX(100%)"
+  :style="$store.cart.open ? 'transform: translateX(0)' : 'transform: translateX(100%)'"
+  aria-label="Carrito de compras"
+>
+  <!-- Drawer Header -->
+  <div class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
+    <div class="flex items-center gap-2">
+      <svg class="w-5 h-5 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+      </svg>
+      <h2 class="text-lg font-heading font-700 text-text-dark">Tu carrito</h2>
+    </div>
+    <button @click="$store.cart.open = false" class="p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer" aria-label="Cerrar carrito">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+      </svg>
+    </button>
+  </div>
+
+  <!-- Empty State -->
+  <div x-show="$store.cart.items.length === 0" class="flex-1 flex flex-col items-center justify-center gap-3 px-6 text-center">
+    <svg class="w-16 h-16 text-gray-200" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+    </svg>
+    <p class="text-gray-400 font-body">Tu carrito está vacío</p>
+    <button @click="$store.cart.open = false; document.getElementById('ebooks').scrollIntoView({behavior:'smooth'})"
+      class="mt-2 px-5 py-2 bg-primary text-white rounded-full text-sm font-semibold hover:bg-primary/90 transition-colors cursor-pointer">
+      Ver e-books
+    </button>
+  </div>
+
+  <!-- Items List -->
+  <div x-show="$store.cart.items.length > 0" class="flex-1 overflow-y-auto px-5 py-4 space-y-4">
+    <template x-for="item in $store.cart.items" :key="item.id">
+      <div class="flex gap-3 bg-accent/30 rounded-xl p-3">
+        <div class="w-14 h-14 rounded-lg bg-accent flex-shrink-0 overflow-hidden">
+          <img :src="item.imagen_url || 'assets/img/ebook-placeholder.svg'" :alt="item.titulo" class="w-full h-full object-cover" />
+        </div>
+        <div class="flex-1 min-w-0">
+          <p class="font-semibold text-sm text-text-dark line-clamp-2" x-text="item.titulo"></p>
+          <p class="text-xs text-secondary font-semibold mt-0.5">
+            +<span x-text="item.participaciones"></span> participación<span x-show="item.participaciones > 1">es</span>
+          </p>
+          <div class="flex items-center justify-between mt-2">
+            <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden">
+              <button @click="$store.cart.decrement(item.id)" class="px-2 py-1 hover:bg-gray-100 transition-colors cursor-pointer text-sm font-bold">−</button>
+              <span class="px-2 text-sm font-semibold" x-text="item.qty"></span>
+              <button @click="$store.cart.increment(item.id)" class="px-2 py-1 hover:bg-gray-100 transition-colors cursor-pointer text-sm font-bold">+</button>
+            </div>
+            <span class="text-sm font-bold text-primary" x-text="CONFIG.formatCLP(item.precio * item.qty)"></span>
+          </div>
+        </div>
+        <button @click="$store.cart.remove(item.id)" class="self-start p-1 text-gray-300 hover:text-red-400 transition-colors cursor-pointer" aria-label="Eliminar">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+        </button>
+      </div>
+    </template>
+  </div>
+
+  <!-- Cart Footer -->
+  <div x-show="$store.cart.items.length > 0" class="border-t border-gray-100 px-5 py-4 space-y-3">
+    <div class="flex justify-between text-sm text-gray-500">
+      <span>Participaciones obtenidas:</span>
+      <span class="font-bold text-secondary" x-text="$store.cart.tickets + ' 🎟️'"></span>
+    </div>
+    <div class="flex justify-between font-heading font-700 text-lg">
+      <span>Total:</span>
+      <span class="text-primary" x-text="CONFIG.formatCLP($store.cart.total)"></span>
+    </div>
+    <button
+      @click="openCheckout()"
+      class="w-full py-3 bg-cta hover:bg-cta-dark text-white font-heading font-700 rounded-xl transition-colors cursor-pointer text-base shadow-lg shadow-cta/30"
+    >
+      Ir al pago →
+    </button>
+  </div>
+</aside>
+
+
+<!-- ============================================================
+     CHECKOUT MODAL
+     ============================================================ -->
+<div
+  x-show="checkoutOpen"
+  x-transition:enter="transition-opacity duration-200"
+  x-transition:enter-start="opacity-0"
+  x-transition:enter-end="opacity-100"
+  x-transition:leave="transition-opacity duration-200"
+  x-transition:leave-start="opacity-100"
+  x-transition:leave-end="opacity-0"
+  class="fixed inset-0 z-[60] flex items-center justify-center p-4 modal-backdrop bg-black/50"
+  style="display:none"
+>
+  <div
+    x-show="checkoutOpen"
+    x-transition:enter="transition duration-200"
+    x-transition:enter-start="opacity-0 scale-95"
+    x-transition:enter-end="opacity-100 scale-100"
+    @click.stop
+    class="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto"
+  >
+    <!-- Modal Header -->
+    <div class="flex items-center justify-between px-6 pt-6 pb-4 border-b border-gray-100">
+      <h2 class="text-xl font-heading font-700">Finalizar compra</h2>
+      <button @click="checkoutOpen = false" class="p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <form @submit.prevent="submitOrder()" class="px-6 py-5 space-y-4">
+      <!-- Order Summary -->
+      <div class="bg-accent/40 rounded-xl p-4">
+        <p class="text-sm font-semibold text-text-dark mb-2">Resumen del pedido</p>
+        <template x-for="item in $store.cart.items" :key="item.id">
+          <div class="flex justify-between text-sm py-1">
+            <span x-text="item.titulo + ' × ' + item.qty" class="text-gray-600"></span>
+            <span class="font-semibold" x-text="CONFIG.formatCLP(item.precio * item.qty)"></span>
+          </div>
+        </template>
+        <div class="border-t border-accent mt-2 pt-2 flex justify-between font-bold">
+          <span>Total</span>
+          <span class="text-primary" x-text="CONFIG.formatCLP($store.cart.total)"></span>
+        </div>
+        <p class="mt-2 text-xs text-secondary font-semibold">
+          Obtienes <span x-text="$store.cart.tickets"></span> participación<span x-show="$store.cart.tickets !== 1">es</span> para el sorteo
+        </p>
+      </div>
+
+      <!-- Customer Form -->
+      <div>
+        <label class="block text-sm font-semibold text-text-dark mb-1" for="ch-nombre">Nombre completo</label>
+        <input id="ch-nombre" x-model="checkoutForm.nombre" type="text" required placeholder="Juan Pérez"
+          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition" />
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-text-dark mb-1" for="ch-email">Correo electrónico</label>
+        <input id="ch-email" x-model="checkoutForm.email" type="email" required placeholder="juan@email.com"
+          class="w-full border border-gray-200 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition" />
+      </div>
+      <div>
+        <label class="block text-sm font-semibold text-text-dark mb-1" for="ch-tel">Teléfono</label>
+        <div class="flex">
+          <span class="flex items-center px-3 border border-r-0 border-gray-200 rounded-l-xl bg-gray-50 text-sm text-gray-500">+56</span>
+          <input id="ch-tel" x-model="checkoutForm.telefono" type="tel" placeholder="9 1234 5678"
+            class="flex-1 border border-gray-200 rounded-r-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary transition" />
+        </div>
+      </div>
+
+      <!-- Error -->
+      <p x-show="checkoutError" x-text="checkoutError" class="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2"></p>
+
+      <!-- Submit -->
+      <button
+        type="submit"
+        :disabled="checkoutLoading"
+        class="w-full py-3.5 bg-cta hover:bg-cta-dark disabled:opacity-60 disabled:cursor-not-allowed text-white font-heading font-700 rounded-xl transition-colors cursor-pointer text-base shadow-lg shadow-cta/30"
+      >
+        <span x-show="!checkoutLoading">Pagar con Flow.cl →</span>
+        <span x-show="checkoutLoading" class="flex items-center justify-center gap-2">
+          <svg class="animate-spin w-4 h-4" viewBox="0 0 24 24" fill="none">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"/>
+          </svg>
+          Procesando...
+        </span>
+      </button>
+      <p class="text-center text-xs text-gray-400">Pago seguro procesado por Flow.cl</p>
+    </form>
+  </div>
+</div>
+
+
+<!-- ============================================================
+     NAVBAR
+     ============================================================ -->
+<nav class="sticky top-0 z-30 bg-white/90 backdrop-blur-md border-b border-gray-100 shadow-sm">
+  <div class="max-w-6xl mx-auto px-4 sm:px-6 flex items-center justify-between h-16">
+    <!-- Logo -->
+    <a href="#" class="flex-shrink-0">
+      <img src="Logos/Logo negro.png" alt="CompraTuParcela" class="h-8 sm:h-10 w-auto" />
+    </a>
+
+    <!-- Nav Links -->
+    <div class="flex items-center gap-4 sm:gap-6">
+      <a href="#parcelas" class="hidden sm:block text-sm font-semibold text-text-dark hover:text-primary transition-colors cursor-pointer">
+        Conoce las parcelas
+      </a>
+
+      <!-- Cart Button -->
+      <button
+        @click="$store.cart.open = true"
+        class="relative p-2 rounded-full hover:bg-accent transition-colors cursor-pointer"
+        aria-label="Abrir carrito"
+      >
+        <svg class="w-6 h-6 text-text-dark" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+        <!-- Badge -->
+        <span
+          x-show="$store.cart.count > 0"
+          x-text="$store.cart.count"
+          class="absolute -top-1 -right-1 w-5 h-5 bg-cta text-white text-xs font-bold rounded-full flex items-center justify-center"
+        ></span>
+      </button>
+    </div>
+  </div>
+</nav>
+
+
+<!-- ============================================================
+     HERO SECTION
+     ============================================================ -->
+<section class="hero-bg py-14 sm:py-20 px-4">
+  <div class="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+    <!-- Text -->
+    <div class="space-y-5">
+      <h1 class="font-heading font-900 text-4xl sm:text-5xl lg:text-6xl text-primary leading-tight">
+        #QuieroMiParcela
+      </h1>
+      <p class="text-lg sm:text-xl text-text-dark/80 font-body leading-relaxed">
+        Compra nuestro e-book y participa por una de las
+      </p>
+      <div class="flex items-center gap-3">
+        <span class="font-heading font-900 text-6xl sm:text-7xl text-cta" x-text="siteConfig.sorteo_parcelas || '3'">3</span>
+        <span class="text-2xl sm:text-3xl font-heading font-700 text-text-dark">Parcelas a regalar</span>
+      </div>
+      <div class="flex flex-wrap gap-3 pt-2">
+        <a href="#ebooks"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-primary text-white font-heading font-700 rounded-full hover:bg-primary/90 transition-all shadow-lg shadow-primary/30 cursor-pointer text-base">
+          Compra Tu e-book
+        </a>
+      </div>
+    </div>
+
+    <!-- Right column: Image + Countdown -->
+    <div class="flex flex-col items-center gap-6">
+      <!-- Hero image -->
+      <div class="w-full aspect-[4/3] rounded-2xl overflow-hidden bg-accent shadow-xl">
+        <img
+          x-show="siteConfig.hero_imagen_url"
+          :src="siteConfig.hero_imagen_url"
+          alt="Parcelas disponibles"
+          class="w-full h-full object-cover"
+        />
+        <!-- Placeholder cuando no hay imagen -->
+        <div x-show="!siteConfig.hero_imagen_url" class="w-full h-full flex flex-col items-center justify-center gap-3 bg-gradient-to-br from-accent to-secondary/20">
+          <svg class="w-20 h-20 text-primary/30" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+          </svg>
+          <span class="text-primary/40 text-sm font-semibold">Foto de la parcela</span>
+        </div>
+      </div>
+
+      <!-- Countdown -->
+      <div class="w-full bg-white rounded-2xl shadow-md border border-accent px-5 py-4">
+        <p class="text-center text-sm font-semibold text-gray-500 mb-3 uppercase tracking-wider">Cuenta regresiva al sorteo</p>
+        <div class="grid grid-cols-4 gap-2 text-center pr-12 sm:pr-0">
+          <div class="bg-primary/5 rounded-xl py-3">
+            <span class="font-heading font-800 text-2xl sm:text-3xl text-primary countdown-digit" x-text="countdown.days">00</span>
+            <p class="text-xs text-gray-400 mt-1">días</p>
+          </div>
+          <div class="bg-primary/5 rounded-xl py-3">
+            <span class="font-heading font-800 text-2xl sm:text-3xl text-primary countdown-digit" x-text="countdown.hours">00</span>
+            <p class="text-xs text-gray-400 mt-1">horas</p>
+          </div>
+          <div class="bg-primary/5 rounded-xl py-3">
+            <span class="font-heading font-800 text-2xl sm:text-3xl text-primary countdown-digit" x-text="countdown.minutes">00</span>
+            <p class="text-xs text-gray-400 mt-1">min</p>
+          </div>
+          <div class="bg-primary/5 rounded-xl py-3">
+            <span class="font-heading font-800 text-2xl sm:text-3xl text-primary countdown-digit" x-text="countdown.seconds">00</span>
+            <p class="text-xs text-gray-400 mt-1">seg</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     PROGRESS BAR SECTION
+     ============================================================ -->
+<section class="bg-white py-10 px-4 border-y border-gray-100">
+  <div class="max-w-4xl mx-auto">
+    <p class="text-center text-base sm:text-lg font-body text-text-dark/70 mb-6">
+      Mientras más e-books sean vendidos, más parcelas regalaremos
+    </p>
+
+    <!-- Progress track -->
+    <div class="relative pt-7">
+      <!-- Labels above milestones (absolutely positioned) -->
+      <template x-for="(ms, i) in milestones" :key="i">
+        <span
+          class="absolute top-0 -translate-x-1/2 text-xs font-semibold whitespace-nowrap"
+          :class="progressPct >= (ms / (siteConfig.progress_goal || 200)) * 100 ? 'text-primary' : 'text-gray-400'"
+          :style="'left:' + ((ms / (siteConfig.progress_goal || 200)) * 100) + '%'"
+          x-text="'+1 parcela'"
+        ></span>
+      </template>
+
+      <!-- Bar container -->
+      <div class="relative h-6 bg-gray-100 rounded-full overflow-visible shadow-inner">
+        <!-- Fill -->
+        <div
+          class="progress-bar absolute top-0 left-0 h-full bg-gradient-to-r from-primary to-secondary rounded-full"
+          :style="'width:' + Math.min(progressPct, 100) + '%'"
+        ></div>
+
+        <!-- Milestone ticks -->
+        <template x-for="(ms, i) in milestones" :key="i">
+          <div
+            class="milestone-tick"
+            :class="progressPct >= (ms / (siteConfig.progress_goal || 200)) * 100 ? 'passed' : ''"
+            :style="'left:' + ((ms / (siteConfig.progress_goal || 200)) * 100) + '%'"
+          ></div>
+        </template>
+      </div>
+
+      <!-- Progress info -->
+      <div class="flex justify-between mt-3 text-sm">
+        <span class="font-semibold text-primary" x-text="(siteConfig.progress_current || 0) + ' e-books vendidos'"></span>
+        <span class="text-gray-400" x-text="'Meta: ' + (siteConfig.progress_goal || 200)"></span>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     EBOOKS SECTION
+     ============================================================ -->
+<section id="ebooks" class="py-16 px-4 bg-cream">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="font-heading font-800 text-3xl sm:text-4xl text-text-dark text-center mb-12">
+      Compra tu e-book
+    </h2>
+
+    <!-- Loading skeletons -->
+    <div x-show="ebooksLoading" class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <template x-for="n in 3" :key="n">
+        <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+          <div class="skeleton h-48 w-full"></div>
+          <div class="p-5 space-y-3">
+            <div class="skeleton h-4 w-3/4"></div>
+            <div class="skeleton h-4 w-1/2"></div>
+            <div class="skeleton h-10 w-full"></div>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <!-- Ebooks Grid -->
+    <div x-show="!ebooksLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 items-start">
+      <template x-for="ebook in ebooks" :key="ebook.id">
+        <div class="relative bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm hover:shadow-lg transition-shadow flex flex-col"
+          :class="ebook.best_seller ? 'best-seller-card' : ''">
+          <!-- Best Seller Badge -->
+          <div x-show="ebook.best_seller" class="absolute top-3 right-3 z-10 bg-cta text-white text-xs font-bold px-3 py-1 rounded-full shadow">
+            Best seller
+          </div>
+
+          <!-- Cover Image -->
+          <div class="w-full aspect-[4/3] bg-accent/50 overflow-hidden">
+            <img
+              :src="ebook.imagen_url || 'https://placehold.co/400x300/D8F3DC/2D6A4F?text=e-book'"
+              :alt="ebook.titulo"
+              class="w-full h-full object-cover"
+              loading="lazy"
+            />
+          </div>
+
+          <!-- Content -->
+          <div class="p-5 flex flex-col flex-1">
+            <h3 class="font-heading font-700 text-lg text-text-dark leading-snug mb-2" x-text="ebook.titulo"></h3>
+            <p class="text-sm text-gray-500 flex-1 mb-4" x-text="ebook.descripcion"></p>
+
+            <!-- Price -->
+            <div class="flex items-center gap-2 mb-3">
+              <span class="text-2xl font-heading font-800 text-primary" x-text="CONFIG.formatCLP(ebook.precio)"></span>
+            </div>
+
+            <!-- CTA -->
+            <button
+              @click="addToCart(ebook)"
+              class="w-full py-3 bg-cta hover:bg-cta-dark text-white font-heading font-700 rounded-xl transition-colors cursor-pointer shadow-md shadow-cta/20"
+            >
+              Comprar ahora
+            </button>
+
+            <!-- Participaciones -->
+            <p class="text-center text-xs text-secondary font-semibold mt-2">
+              + <span x-text="ebook.participaciones"></span> participación<span x-show="ebook.participaciones > 1">es</span>
+            </p>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     PARCELAS SECTION
+     ============================================================ -->
+<section id="parcelas" class="py-16 px-4 bg-white">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="font-heading font-800 text-3xl sm:text-4xl text-text-dark text-center mb-3">
+      Gana una de estas parcelas
+    </h2>
+    <p class="text-center text-gray-500 mb-12">por la compra de tu e-book</p>
+
+    <!-- Loading -->
+    <div x-show="parcelasLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <template x-for="n in 6" :key="n">
+        <div class="rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+          <div class="skeleton h-44 w-full"></div>
+          <div class="p-4 space-y-2">
+            <div class="skeleton h-4 w-1/2"></div>
+            <div class="skeleton h-3 w-3/4"></div>
+          </div>
+        </div>
+      </template>
+    </div>
+
+    <!-- Parcelas Grid -->
+    <div x-show="!parcelasLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <template x-for="parcela in parcelas" :key="parcela.id">
+        <div class="relative rounded-2xl overflow-hidden border shadow-sm hover:shadow-lg transition-shadow"
+          :class="parcela.estado === 'disponible' ? 'border-gray-100 bg-white' : 'border-gray-200 bg-gray-50'"
+        >
+          <!-- Image -->
+          <div class="relative w-full aspect-[4/3] overflow-hidden">
+            <img
+              :src="parcela.imagen_url || 'https://placehold.co/400x300/D8F3DC/2D6A4F?text=Parcela'"
+              :alt="parcela.nombre"
+              class="w-full h-full object-cover"
+              :class="parcela.estado !== 'disponible' ? 'grayscale opacity-60' : ''"
+              loading="lazy"
+            />
+            <!-- Locked overlay -->
+            <div x-show="parcela.estado !== 'disponible'"
+              class="absolute inset-0 flex flex-col items-center justify-center bg-text-dark/60 backdrop-blur-sm">
+              <svg class="w-10 h-10 text-white/80 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+              </svg>
+              <span class="text-white font-heading font-700 text-lg tracking-widest">BLOQUEADA</span>
+            </div>
+          </div>
+
+          <!-- Info -->
+          <div class="p-4">
+            <h3 class="font-heading font-700 text-base text-text-dark mb-1" x-text="parcela.nombre"></h3>
+            <p class="text-sm font-semibold text-primary mb-1" x-text="parcela.proyecto"></p>
+            <div class="space-y-0.5 text-xs text-gray-500">
+              <p x-show="parcela.ubicacion"><span class="font-semibold">Ubicación:</span> <span x-text="parcela.ubicacion"></span></p>
+              <p x-show="parcela.metraje"><span class="font-semibold">Metraje:</span> <span x-text="parcela.metraje"></span></p>
+              <p x-show="parcela.precio" class="text-primary font-semibold text-sm mt-1">Parcela valuada en <span x-text="parcela.precio"></span></p>
+            </div>
+            <a
+              x-show="parcela.estado === 'disponible' && parcela.ver_mas_url"
+              :href="parcela.ver_mas_url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-1 mt-3 text-xs font-bold text-primary hover:text-secondary transition-colors cursor-pointer"
+            >
+              Ver más
+              <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+      </template>
+    </div>
+  </div>
+</section>
+
+
+<!-- ============================================================
+     FOOTER
+     ============================================================ -->
+<footer class="bg-text-dark text-white py-10 px-4">
+  <div class="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+    <div>
+      <img src="Logos/Logo blanco.png" alt="CompraTuParcela" class="h-9 w-auto mb-3" />
+      <p class="text-xs text-white/50">© <span x-text="new Date().getFullYear()"></span> CompraTuParcela. Todos los derechos reservados.</p>
+    </div>
+    <div class="flex flex-col items-center sm:items-end gap-2 text-sm text-white/60">
+      <a href="#ebooks" class="hover:text-white transition-colors cursor-pointer">Comprar e-books</a>
+      <a href="#parcelas" class="hover:text-white transition-colors cursor-pointer">Las parcelas</a>
+      <a :href="'https://wa.me/' + (siteConfig.whatsapp_number || CONFIG.WHATSAPP_DEFAULT)"
+        target="_blank" rel="noopener noreferrer"
+        class="hover:text-white transition-colors cursor-pointer flex items-center gap-1">
+        <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        WhatsApp
+      </a>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ============================================================
+     WHATSAPP FLOATING WIDGET
+     ============================================================ -->
+<a
+  :href="'https://wa.me/' + (siteConfig.whatsapp_number || CONFIG.WHATSAPP_DEFAULT) + '?text=Hola!%20Tengo%20una%20consulta%20sobre%20los%20e-books.'"
+  target="_blank"
+  rel="noopener noreferrer"
+  class="fixed bottom-6 right-6 z-50 flex items-center justify-center w-14 h-14 rounded-full shadow-xl cursor-pointer wa-pulse group"
+  style="background-color: #25D366"
+  aria-label="Contactar por WhatsApp"
+>
+  <!-- WhatsApp SVG Icon -->
+  <svg class="w-7 h-7 fill-white" viewBox="0 0 24 24">
+    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+  </svg>
+  <!-- Tooltip -->
+  <span class="absolute right-16 bg-white text-gray-700 text-xs font-semibold px-3 py-1.5 rounded-full shadow-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none">
+    ¿Tienes dudas? ¡Escríbenos!
+  </span>
+</a>
+
+
+<!-- ============================================================
+     ALPINE.JS APP
+     ============================================================ -->
+<script>
+document.addEventListener('alpine:init', () => {
+
+  // ---- Cart Store ----
+  Alpine.store('cart', {
+    open: false,
+    items: [],
+
+    add(ebook) {
+      const existing = this.items.find(i => i.id === ebook.id);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        this.items.push({ ...ebook, qty: 1 });
+      }
+      this.open = true;
+    },
+
+    remove(id) {
+      this.items = this.items.filter(i => i.id !== id);
+    },
+
+    increment(id) {
+      const item = this.items.find(i => i.id === id);
+      if (item) item.qty += 1;
+    },
+
+    decrement(id) {
+      const item = this.items.find(i => i.id === id);
+      if (!item) return;
+      if (item.qty <= 1) {
+        this.remove(id);
+      } else {
+        item.qty -= 1;
+      }
+    },
+
+    get total() {
+      return this.items.reduce((sum, i) => sum + i.precio * i.qty, 0);
+    },
+
+    get tickets() {
+      return this.items.reduce((sum, i) => sum + i.participaciones * i.qty, 0);
+    },
+
+    get count() {
+      return this.items.reduce((sum, i) => sum + i.qty, 0);
+    },
+  });
+
+});
+
+// ---- Main App ----
+function app() {
+  return {
+    // Data
+    siteConfig:     {},
+    ebooks:         [],
+    parcelas:       [],
+    milestones:     [],
+    progressPct:    0,
+    countdown:      { days: '00', hours: '00', minutes: '00', seconds: '00' },
+
+    // Loading states
+    ebooksLoading:   true,
+    parcelasLoading: true,
+
+    // Checkout
+    checkoutOpen:    false,
+    checkoutLoading: false,
+    checkoutError:   '',
+    checkoutForm:    { nombre: '', email: '', telefono: '' },
+
+    // ---- Init ----
+    async init() {
+      await this.loadConfig();
+      await Promise.all([this.loadEbooks(), this.loadParcelas()]);
+      this.startCountdown();
+    },
+
+    // ---- Demo data (shown when GAS not yet connected) ----
+    demoConfig() {
+      const d = new Date(); d.setDate(d.getDate() + 47);
+      return {
+        countdown_datetime: d.toISOString(),
+        progress_current:   47,
+        progress_goal:      200,
+        whatsapp_number:    CONFIG.WHATSAPP_DEFAULT,
+        hero_imagen_url:    'https://lh3.googleusercontent.com/d/1vurUR_mxkMh8Q5ORDNqjv9GU-peB419M',
+        sorteo_parcelas:    3,
+        milestone_1: 50, milestone_2: 100, milestone_3: 150, milestone_4: 200,
+      };
+    },
+
+    demoEbooks() {
+      return [
+        { id:'1', titulo:'Cómo construir en tu parcela', descripcion:'Guía completa con todo lo que necesitas saber para construir en tu parcela de forma legal y eficiente.', precio:10000, participaciones:1, imagen_url:'', best_seller:false },
+        { id:'2', titulo:'Cómo cultivar en tu parcela', descripcion:'Aprende las mejores técnicas de cultivo para aprovechar al máximo tu parcela y vivir de la tierra.', precio:10000, participaciones:1, imagen_url:'', best_seller:false },
+        { id:'3', titulo:'Pack guía completa', descripcion:'Los dos e-books juntos con acceso a contenido exclusivo y guías adicionales de expertos.', precio:15000, participaciones:2, imagen_url:'', best_seller:true },
+      ];
+    },
+
+    demoParcelas() {
+      return [
+        { id:'1', nombre:'Parcela 1', proyecto:'Proyecto Valle Verde', ubicacion:'Los Andes, V Región', metraje:'5.000 m²', precio:'$12.000.000', estado:'disponible', imagen_url:'', ver_mas_url:'#' },
+        { id:'2', nombre:'Parcela 2', proyecto:'Proyecto Valle Verde', ubicacion:'Los Andes, V Región', metraje:'4.500 m²', precio:'$10.500.000', estado:'disponible', imagen_url:'', ver_mas_url:'#' },
+        { id:'3', nombre:'Parcela 3', proyecto:'Proyecto Valle Verde', ubicacion:'Los Andes, V Región', metraje:'6.000 m²', precio:'$14.000.000', estado:'disponible', imagen_url:'', ver_mas_url:'#' },
+        { id:'4', nombre:'BLOQUEADA', proyecto:'Proyecto Valle Verde', ubicacion:'Los Andes, V Región', metraje:'5.000 m²', precio:'$12.000.000', estado:'bloqueada', imagen_url:'', ver_mas_url:'' },
+        { id:'5', nombre:'BLOQUEADA', proyecto:'Proyecto Valle Verde', ubicacion:'Los Andes, V Región', metraje:'4.500 m²', precio:'$10.500.000', estado:'bloqueada', imagen_url:'', ver_mas_url:'' },
+        { id:'6', nombre:'BLOQUEADA', proyecto:'Proyecto Valle Verde', ubicacion:'Los Andes, V Región', metraje:'6.000 m²', precio:'$14.000.000', estado:'bloqueada', imagen_url:'', ver_mas_url:'' },
+      ];
+    },
+
+    isDemo() {
+      return CONFIG.GAS_URL.includes('TU_DEPLOYMENT_ID_AQUI');
+    },
+
+    // ---- Load Config ----
+    async loadConfig() {
+      if (this.isDemo()) {
+        const data = this.demoConfig();
+        this.applyConfig(data);
+        return;
+      }
+      try {
+        const res = await fetch(CONFIG.GAS_URL + '?action=getConfig', { signal: AbortSignal.timeout(8000) });
+        const data = await res.json();
+        this.applyConfig(data);
+      } catch (e) {
+        console.error('Config load error:', e);
+        this.applyConfig(this.demoConfig());
+      }
+    },
+
+    applyConfig(data) {
+      this.siteConfig = data;
+      const ms = [];
+      for (let i = 1; i <= 5; i++) {
+        const val = Number(data['milestone_' + i]);
+        if (val) ms.push(val);
+      }
+      this.milestones = ms;
+      const current = Number(data.progress_current) || 0;
+      const goal    = Number(data.progress_goal)    || 200;
+      this.progressPct = Math.min((current / goal) * 100, 100);
+      if (data.countdown_datetime) {
+        this.countdownTarget = new Date(data.countdown_datetime).getTime();
+      }
+    },
+
+    // ---- Load Ebooks ----
+    async loadEbooks() {
+      if (this.isDemo()) {
+        this.ebooks = this.demoEbooks();
+        this.ebooksLoading = false;
+        return;
+      }
+      try {
+        const res  = await fetch(CONFIG.GAS_URL + '?action=getEbooks', { signal: AbortSignal.timeout(8000) });
+        this.ebooks = await res.json();
+      } catch (e) {
+        console.error('Ebooks load error:', e);
+        this.ebooks = this.demoEbooks();
+      } finally {
+        this.ebooksLoading = false;
+      }
+    },
+
+    // ---- Load Parcelas ----
+    async loadParcelas() {
+      if (this.isDemo()) {
+        this.parcelas = this.demoParcelas();
+        this.parcelasLoading = false;
+        return;
+      }
+      try {
+        const res      = await fetch(CONFIG.GAS_URL + '?action=getParcelas', { signal: AbortSignal.timeout(8000) });
+        this.parcelas  = await res.json();
+      } catch (e) {
+        console.error('Parcelas load error:', e);
+        this.parcelas = this.demoParcelas();
+      } finally {
+        this.parcelasLoading = false;
+      }
+    },
+
+    // ---- Countdown ----
+    countdownTarget: null,
+
+    startCountdown() {
+      const tick = () => {
+        const target = this.countdownTarget;
+        if (!target) return;
+        const diff = target - Date.now();
+        if (diff <= 0) {
+          this.countdown = { days: '00', hours: '00', minutes: '00', seconds: '00' };
+          return;
+        }
+        const pad = n => String(Math.floor(n)).padStart(2, '0');
+        this.countdown = {
+          days:    pad(diff / 86400000),
+          hours:   pad((diff % 86400000) / 3600000),
+          minutes: pad((diff % 3600000)  / 60000),
+          seconds: pad((diff % 60000)    / 1000),
+        };
+      };
+      tick();
+      setInterval(tick, 1000);
+    },
+
+    // ---- Add to Cart ----
+    addToCart(ebook) {
+      this.$store.cart.add(ebook);
+    },
+
+    // ---- Open Checkout ----
+    openCheckout() {
+      this.$store.cart.open = false;
+      this.checkoutOpen     = true;
+      this.checkoutError    = '';
+    },
+
+    // ---- Submit Order ----
+    async submitOrder() {
+      if (!this.checkoutForm.nombre || !this.checkoutForm.email) {
+        this.checkoutError = 'Por favor completa tu nombre y correo electrónico.';
+        return;
+      }
+
+      this.checkoutLoading = true;
+      this.checkoutError   = '';
+
+      try {
+        const body = {
+          nombre:   this.checkoutForm.nombre,
+          email:    this.checkoutForm.email,
+          telefono: this.checkoutForm.telefono,
+          items:    this.$store.cart.items.map(i => ({
+            id:              i.id,
+            titulo:          i.titulo,
+            precio:          i.precio,
+            participaciones: i.participaciones,
+            qty:             i.qty,
+          })),
+        };
+
+        const res  = await fetch(CONFIG.GAS_URL + '?action=createOrder', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify(body),
+        });
+
+        const data = await res.json();
+
+        if (data.error) {
+          this.checkoutError = 'Error al procesar: ' + data.error;
+          return;
+        }
+
+        if (data.flowUrl) {
+          // Redirect to Flow.cl
+          window.location.href = data.flowUrl;
+        }
+
+      } catch (e) {
+        this.checkoutError = 'Error de conexión. Inténtalo nuevamente.';
+      } finally {
+        this.checkoutLoading = false;
+      }
+    },
+  };
+}
+</script>
+
+</body>
+</html>

@@ -1,0 +1,109 @@
+/* QuieroMiParcela — Custom Styles */
+
+/* ---- Progress bar animation ---- */
+@keyframes progressFill {
+  from { width: 0%; }
+}
+
+.progress-bar {
+  animation: progressFill 1.2s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* ---- WhatsApp pulse ---- */
+@keyframes waPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.5); }
+  50%       { box-shadow: 0 0 0 12px rgba(37, 211, 102, 0); }
+}
+
+.wa-pulse {
+  animation: waPulse 2s ease-in-out infinite;
+}
+
+/* ---- Cart sidebar transition ---- */
+.cart-drawer {
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ---- Countdown digits ---- */
+.countdown-digit {
+  font-variant-numeric: tabular-nums;
+  min-width: 2.5ch;
+  display: inline-block;
+  text-align: center;
+}
+
+/* ---- Parcela card locked overlay ---- */
+.parcela-locked::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(27, 67, 50, 0.55);
+  backdrop-filter: blur(2px);
+  border-radius: inherit;
+}
+
+/* ---- Hero gradient background ---- */
+.hero-bg {
+  background: linear-gradient(135deg, #e8faf2 0%, #ffffff 60%, #f5fff9 100%);
+}
+
+/* ---- Smooth scroll ---- */
+html {
+  scroll-behavior: smooth;
+}
+
+/* ---- Milestone marker ---- */
+.milestone-tick {
+  position: absolute;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #23cb69;
+  background: #fff;
+  z-index: 2;
+}
+
+.milestone-tick.passed {
+  background: #23cb69;
+  border-color: #23cb69;
+}
+
+/* ---- Modal backdrop ---- */
+.modal-backdrop {
+  backdrop-filter: blur(4px);
+}
+
+/* ---- Skeleton loading ---- */
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #e8faf2 25%, #c8f5e0 50%, #e8faf2 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s infinite;
+  border-radius: 0.5rem;
+}
+
+/* ---- Best seller golden glow ---- */
+@keyframes goldenPulse {
+  0%, 100% { box-shadow: 0 0 18px 4px rgba(212,175,55,0.45), 0 0 40px 8px rgba(212,175,55,0.18); }
+  50%       { box-shadow: 0 0 28px 8px rgba(212,175,55,0.65), 0 0 60px 16px rgba(212,175,55,0.28); }
+}
+
+.best-seller-card {
+  border: 1.5px solid #d4af37 !important;
+  animation: goldenPulse 2.8s ease-in-out infinite;
+  transform: scale(1.03);
+}
+
+/* ---- Reduced motion ---- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

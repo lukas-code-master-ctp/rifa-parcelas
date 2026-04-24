@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>¡Compra exitosa! — QuieroMiParcela</title>
+  <link rel="icon" type="image/png" href="Logos/Favicon.png" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@400;600;700&family=Rubik:wght@700;800;900&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: { extend: {
+        colors: { primary: '#23cb69', secondary: '#1aaa55', cta: '#000000', accent: '#e8faf2', cream: '#ffffff', 'text-dark': '#000000' },
+        fontFamily: { heading: ['Rubik','sans-serif'], body: ['Nunito Sans','sans-serif'] },
+      }}
+    };
+  </script>
+  <style>
+    body { font-family: 'Nunito Sans', sans-serif; }
+    h1,h2,h3 { font-family: 'Rubik', sans-serif; }
+    @keyframes checkPop { 0% { transform: scale(0); opacity: 0; } 70% { transform: scale(1.15); } 100% { transform: scale(1); opacity: 1; } }
+    .check-anim { animation: checkPop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards; }
+  </style>
+</head>
+<body class="bg-cream min-h-screen flex flex-col items-center justify-center px-4">
+
+  <!-- Navbar -->
+  <nav class="fixed top-0 left-0 right-0 bg-white/90 backdrop-blur-md border-b border-gray-100 z-10">
+    <div class="max-w-6xl mx-auto px-4 h-16 flex items-center">
+      <a href="index.html"><img src="Logos/Logo negro.png" alt="CompraTuParcela" class="h-9 w-auto" /></a>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="pt-24 pb-16 flex flex-col items-center text-center max-w-md w-full">
+
+    <!-- Check icon -->
+    <div class="check-anim w-24 h-24 rounded-full bg-secondary/20 flex items-center justify-center mb-6">
+      <svg class="w-12 h-12 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+      </svg>
+    </div>
+
+    <h1 class="font-heading font-800 text-3xl sm:text-4xl text-text-dark mb-3">¡Compra exitosa!</h1>
+    <p class="text-gray-500 text-base mb-2">Tu pago fue procesado correctamente por Flow.cl.</p>
+    <p class="text-gray-500 text-sm mb-6">
+      Recibirás un correo con tus e-books y el número de ticket(s) de participación para el sorteo de las parcelas.
+    </p>
+
+    <!-- Ticket info card -->
+    <div class="w-full bg-white rounded-2xl border border-accent shadow-sm p-5 mb-8">
+      <div class="flex items-center gap-3 mb-3">
+        <span class="text-2xl">🎟️</span>
+        <h2 class="font-heading font-700 text-lg text-text-dark">Tus participaciones están activas</h2>
+      </div>
+      <p class="text-sm text-gray-500">
+        Cada ticket te da una chance de ganar una de las parcelas que estamos rifando. ¡Mucha suerte!
+      </p>
+    </div>
+
+    <!-- Share -->
+    <p class="text-sm text-gray-400 mb-4">¿Quieres que tus amigos también participen?</p>
+    <a
+      href="https://wa.me/?text=Acabo%20de%20comprar%20mi%20e-book%20en%20%23QuieroMiParcela%20y%20estoy%20participando%20por%20ganar%20una%20parcela!%20%F0%9F%8C%B3"
+      target="_blank" rel="noopener noreferrer"
+      class="inline-flex items-center gap-2 px-5 py-3 rounded-full text-white text-sm font-bold shadow-lg cursor-pointer transition-opacity hover:opacity-90 mb-6"
+      style="background-color:#25D366"
+    >
+      <svg class="w-5 h-5 fill-white" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      Compartir por WhatsApp
+    </a>
+
+    <a href="index.html" class="text-sm text-primary font-semibold hover:underline cursor-pointer">← Volver al inicio</a>
+  </main>
+
+</body>
+</html>

@@ -17,15 +17,17 @@ export async function POST(req: NextRequest) {
     const tickets = items.reduce((s, i) => s + i.participaciones * i.qty, 0);
     const orderId = `ORD-${Date.now()}`;
 
-    await appendRow('Pedidos!A:I', [
-      new Date().toISOString(), nombre, email, telefono ?? '',
-      JSON.stringify(items), total, tickets, 'pending', orderId,
-    ]);
-
-    const flowUrl = await createPayment({
+    const { flowUrl, token } = await createPayment({
       orderId, amount: total, email,
       subject: 'Compra e-book QuieroMiParcela',
     });
+
+    // Columns: A=timestamp B=nombre C=email D=telefono E=items_json
+    //          F=total G=tickets_count H=payment_status I=orderId J=flow_token K=ticket_codes
+    await appendRow('Pedidos!A:K', [
+      new Date().toISOString(), nombre, email, telefono ?? '',
+      JSON.stringify(items), total, tickets, 'pending', orderId, token, '',
+    ]);
 
     return NextResponse.json({ success: true, flowUrl, orderId, total, tickets });
   } catch (e) {

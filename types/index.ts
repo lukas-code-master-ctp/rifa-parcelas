@@ -45,3 +45,14 @@ export interface OrderItem {
 export interface CartItem extends OrderItem {
   imagen_url?: string;
 }
+
+export interface TicketOrder {
+  orderId:     string;
+  nombre:      string;
+  email:       string;
+  total:       number;
+  ticketCount: number;
+  ticketCodes: string[];
+  status:      string;
+  timestamp:   string;
+}

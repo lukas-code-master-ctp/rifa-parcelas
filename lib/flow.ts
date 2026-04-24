@@ -14,7 +14,7 @@ export async function createPayment(opts: {
   amount:   number;
   email:    string;
   subject:  string;
-}): Promise<string> {
+}): Promise<{ flowUrl: string; token: string }> {
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? '';
 
   const params: Record<string, string> = {
@@ -39,7 +39,7 @@ export async function createPayment(opts: {
 
   const data = await res.json();
   if (!data.url || !data.token) throw new Error(`Flow error: ${JSON.stringify(data)}`);
-  return `${data.url}?token=${data.token}`;
+  return { flowUrl: `${data.url}?token=${data.token}`, token: data.token };
 }
 
 export async function getPaymentStatus(token: string): Promise<{ status: number; commerceOrder: string }> {

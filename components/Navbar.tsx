@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import CartButton from './CartButton';
+import MyTicketsButton from './MyTicketsButton';
 
 export default function Navbar({ whatsapp }: { whatsapp: string }) {
   return (
@@ -13,6 +14,7 @@ export default function Navbar({ whatsapp }: { whatsapp: string }) {
           <Link href="#parcelas" className="hidden sm:block text-sm font-semibold hover:text-primary transition-colors">
             Conoce las parcelas
           </Link>
+          <MyTicketsButton />
           <CartButton />
         </div>
       </div>

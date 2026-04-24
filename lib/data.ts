@@ -58,7 +58,7 @@ export const getEbooks = cache(async (): Promise<Ebook[]> => {
 export const getParcelas = cache(async (): Promise<Parcela[]> => {
   if (parcelasCache && Date.now() - parcelasCache.ts < TTL) return parcelasCache.data;
 
-  const rows = await readSheet('Parcelas!A:I');
+  const rows = await readSheet('Parcelas!A:J');
   if (rows.length < 2) return [];
   const [, ...data] = rows;
 

@@ -2,6 +2,8 @@
 import { useState } from 'react';
 import { useCartStore, formatCLP } from '@/stores/cartStore';
 
+const SIM = process.env.NEXT_PUBLIC_FLOW_SIMULATION === 'true';
+
 export default function CheckoutModal({ onClose }: { onClose: () => void }) {
   const { items, total, tickets, clear } = useCartStore();
   const [form, setForm]     = useState({ nombre:'', email:'', telefono:'' });
@@ -28,6 +30,14 @@ export default function CheckoutModal({ onClose }: { onClose: () => void }) {
           <h2 className="text-xl font-heading font-bold">Finalizar compra</h2>
           <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-100 transition-colors cursor-pointer">✕</button>
         </div>
+        {SIM && (
+          <div className="mx-6 mt-4 flex items-center gap-2 px-4 py-2.5 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-xs font-semibold">
+            <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v4m0 4h.01M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z" />
+            </svg>
+            Modo simulación — Flow.cl no configurado. El pago se aprobará automáticamente.
+          </div>
+        )}
         <form onSubmit={submit} className="px-6 py-5 space-y-4">
           <div className="bg-accent/40 rounded-xl p-4">
             <p className="text-sm font-semibold mb-2">Resumen del pedido</p>
@@ -61,7 +71,7 @@ export default function CheckoutModal({ onClose }: { onClose: () => void }) {
           {error && <p className="text-red-500 text-sm bg-red-50 rounded-xl px-4 py-2">{error}</p>}
           <button type="submit" disabled={loading}
             className="w-full py-3.5 bg-cta hover:bg-cta-dark disabled:opacity-60 text-white font-heading font-bold rounded-xl transition-colors cursor-pointer shadow-lg">
-            {loading ? 'Procesando...' : 'Pagar con Flow.cl →'}
+            {loading ? 'Procesando...' : SIM ? 'Simular pago (modo prueba) →' : 'Pagar con Flow.cl →'}
           </button>
           <p className="text-center text-xs text-gray-400">Pago seguro procesado por Flow.cl</p>
         </form>

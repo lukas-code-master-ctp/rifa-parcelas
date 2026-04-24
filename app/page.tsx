@@ -21,7 +21,7 @@ export default async function Home() {
         <Hero config={config} />
         <ProgressBar config={config} />
         <EbooksSection ebooks={ebooks} />
-        <ParcelasSection parcelas={parcelas} />
+        <ParcelasSection parcelas={parcelas} progress={config.progress_current} />
       </main>
       <Footer whatsapp={config.whatsapp_number} />
       <CartSidebar />

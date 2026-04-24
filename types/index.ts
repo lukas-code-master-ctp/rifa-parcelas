@@ -30,7 +30,8 @@ export interface Parcela {
   precio:      string;
   estado:      'disponible' | 'bloqueada';
   imagen_url:  string;
-  descripcion: string;
+  descripcion:       string;
+  unlock_milestone:  number;
 }
 
 export interface OrderItem {

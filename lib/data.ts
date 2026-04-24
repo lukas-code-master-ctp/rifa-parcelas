@@ -71,7 +71,8 @@ export const getParcelas = cache(async (): Promise<Parcela[]> => {
     precio:      r[5] ?? '',
     estado:      (r[6]?.toLowerCase() ?? 'bloqueada') as 'disponible' | 'bloqueada',
     imagen_url:  r[7] ?? '',
-    descripcion: r[8] ?? '',
+    descripcion:      r[8] ?? '',
+    unlock_milestone: Number(r[9] ?? 0),
   }));
 
   parcelasCache = { data: parcelas, ts: Date.now() };

@@ -26,6 +26,7 @@ export const getConfig = cache(async (): Promise<SiteConfig> => {
     milestone_3:        Number(map.milestone_3        ?? 150),
     milestone_4:        Number(map.milestone_4        ?? 200),
     hero_imagen_url:    map.hero_imagen_url            ?? '',
+    instagram_url:      map.instagram_url              ?? '',
   };
 
   configCache = { data, ts: Date.now() };

@@ -9,6 +9,7 @@ export interface SiteConfig {
   milestone_3:        number;
   milestone_4:        number;
   hero_imagen_url:    string;
+  instagram_url:      string;
 }
 
 export interface Ebook {

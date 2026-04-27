@@ -8,7 +8,7 @@ export default function ParcelasSection({ parcelas, progress, instagramUrl }: { 
         <h2 className="font-heading font-extrabold text-3xl sm:text-4xl text-center mb-3">Gana una de estas parcelas</h2>
         <p className="text-center text-gray-500 mb-2">por la compra de tu e-book</p>
         <p className="text-center text-gray-400 text-sm mb-12">
-          el sorteo será realizado en video desde nuestro{' '}
+          el sorteo será realizado en vivo desde nuestro{' '}
           {instagramUrl ? (
             <a href={instagramUrl} target="_blank" rel="noopener noreferrer"
               className="text-primary font-semibold hover:underline">

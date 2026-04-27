@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 
 function pad(n: number) { return String(Math.floor(n)).padStart(2, '0'); }
 
-export default function Countdown({ target }: { target: string }) {
+export default function Countdown({ target, instagramUrl }: { target: string; instagramUrl?: string }) {
   const [time, setTime] = useState({ days:'00', hours:'00', minutes:'00', seconds:'00' });
 
   useEffect(() => {
@@ -33,6 +33,17 @@ export default function Countdown({ target }: { target: string }) {
           </div>
         ))}
       </div>
+      <p className="text-center text-xs text-gray-400 mt-3">
+        el sorteo será realizado en vivo desde nuestro{' '}
+        {instagramUrl ? (
+          <a href={instagramUrl} target="_blank" rel="noopener noreferrer"
+            className="text-primary font-semibold hover:underline">
+            Instagram
+          </a>
+        ) : (
+          <span className="text-primary font-semibold">Instagram</span>
+        )}
+      </p>
     </div>
   );
 }

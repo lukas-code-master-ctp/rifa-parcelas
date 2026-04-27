@@ -34,7 +34,7 @@ export default function Hero({ config }: { config: SiteConfig }) {
               </div>
             )}
           </div>
-          <Countdown target={config.countdown_datetime} />
+          <Countdown target={config.countdown_datetime} instagramUrl={config.instagram_url} />
         </div>
       </div>
     </section>

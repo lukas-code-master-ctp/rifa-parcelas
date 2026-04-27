@@ -13,8 +13,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es">
-      <body className={`${rubik.variable} ${nunito.variable} bg-white text-black antialiased`}>
+    <html lang="es" className="overflow-x-hidden">
+      <body className={`${rubik.variable} ${nunito.variable} bg-white text-black antialiased overflow-x-hidden w-full`}>
         {children}
       </body>
     </html>

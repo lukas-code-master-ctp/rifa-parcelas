@@ -1,5 +1,6 @@
 'use client';
 import { useState, useEffect, useRef } from 'react';
+import { createPortal } from 'react-dom';
 import type { TicketOrder } from '@/types';
 
 /* ── helpers ────────────────────────────────────────── */
@@ -105,11 +106,15 @@ function downloadTicketsPNG(order: TicketOrder) {
 /* ── main component ─────────────────────────────────── */
 export default function MyTicketsButton() {
   const [open,    setOpen]    = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [email,   setEmail]   = useState('');
   const [loading, setLoading] = useState(false);
   const [orders,  setOrders]  = useState<TicketOrder[] | null>(null);
   const [error,   setError]   = useState('');
   const inputRef = useRef<HTMLInputElement>(null);
+
+  /* mount flag so createPortal only runs client-side */
+  useEffect(() => { setMounted(true); }, []);
 
   /* close on Escape */
   useEffect(() => {
@@ -164,8 +169,8 @@ export default function MyTicketsButton() {
         Ver mis tickets
       </button>
 
-      {/* modal */}
-      {open && (
+      {/* modal — rendered via portal to escape the sticky navbar stacking context */}
+      {mounted && open && createPortal(
         <div
           className="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
           onClick={handleClose}
@@ -265,7 +270,7 @@ export default function MyTicketsButton() {
                             <div className="flex items-center gap-3">
                               <span className="text-sm font-bold text-primary">{formatCLP(order.total)}</span>
                               <span className="px-2.5 py-0.5 bg-primary/10 text-primary text-xs font-bold rounded-full">
-                                {order.ticketCodes.length} tickets
+                                {order.ticketCodes.length} ticket{order.ticketCodes.length !== 1 ? 's' : ''}
                               </span>
                             </div>
                           </div>
@@ -302,7 +307,8 @@ export default function MyTicketsButton() {
               </div>
             )}
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

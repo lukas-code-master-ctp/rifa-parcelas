@@ -4,8 +4,26 @@ import type { SiteConfig } from '@/types';
 
 export default function Hero({ config }: { config: SiteConfig }) {
   return (
-    <section className="py-14 sm:py-20 px-4" style={{ background: 'linear-gradient(135deg,#e8faf2 0%,#fff 60%,#f5fff9 100%)' }}>
-      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+    <section
+      className="relative overflow-hidden py-14 sm:py-20 px-4"
+      style={{ background: 'linear-gradient(135deg,#e8faf2 0%,#fff 60%,#f5fff9 100%)' }}
+    >
+      {/* ── Left trees ───────────────────────────────────── */}
+      <div className="pointer-events-none select-none absolute bottom-0 left-0 items-end hidden sm:flex">
+        <Image src="/background/16.png" alt="" width={90}  height={130} className="opacity-50 -translate-x-6 translate-y-2" unoptimized />
+        <Image src="/background/17.png" alt="" width={130} height={185} className="opacity-65 -translate-x-2" unoptimized />
+        <Image src="/background/15.png" alt="" width={100} height={145} className="opacity-55 translate-y-4" unoptimized />
+      </div>
+
+      {/* ── Right trees ──────────────────────────────────── */}
+      <div className="pointer-events-none select-none absolute bottom-0 right-0 flex items-end hidden sm:flex">
+        <Image src="/background/15.png" alt="" width={100} height={145} className="opacity-55 translate-y-4" unoptimized />
+        <Image src="/background/17.png" alt="" width={130} height={185} className="opacity-65 translate-x-2" unoptimized />
+        <Image src="/background/16.png" alt="" width={90}  height={130} className="opacity-50 translate-x-6 translate-y-2" unoptimized />
+      </div>
+
+      {/* ── Content ──────────────────────────────────────── */}
+      <div className="relative z-10 max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
         <div className="space-y-5">
           <h1 className="font-heading font-black text-4xl sm:text-5xl lg:text-6xl text-primary leading-tight">
             #QuieroMiParcela

@@ -46,17 +46,15 @@ export default function ParcelaCard({ parcela, progress }: { parcela: Parcela; p
           {/* Mini unlock progress bar — solo en bloqueadas con milestone definido */}
           {locked && milestone > 0 && (
             <div className="mt-3 pt-3 border-t border-gray-100">
-              <div className="flex justify-between text-xs mb-1.5">
-                <span className="font-semibold text-gray-500">
-                  {remaining === 0 ? '¡Lista para desbloquearse!' : `Faltan ${remaining} e-book${remaining !== 1 ? 's' : ''}`}
-                </span>
-                <span className="text-gray-400">{progress}/{milestone}</span>
-              </div>
-              <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
+              <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden mb-1.5">
                 <div
                   className="h-full bg-primary rounded-full transition-all duration-700"
                   style={{ width: `${unlockPct}%` }}
                 />
+              </div>
+              <div className="flex justify-between text-xs">
+                <span className="font-semibold text-primary">{Math.round(unlockPct)}% completado</span>
+                <span className="text-gray-400">Meta: {milestone}</span>
               </div>
             </div>
           )}

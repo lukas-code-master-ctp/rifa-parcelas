@@ -35,7 +35,7 @@ export default function ProgressBar({ config }: { config: SiteConfig }) {
             />
 
             {/* Dots — flex justify-between overlaid on the bar, matching label positions */}
-            <div className="absolute inset-0 flex justify-between items-center px-0">
+            <div className="absolute inset-0 flex justify-between items-center">
               {milestones.map((ms, i) => {
                 const reached = current >= ms;
                 return (
@@ -52,6 +52,12 @@ export default function ProgressBar({ config }: { config: SiteConfig }) {
                 );
               })}
             </div>
+          </div>
+
+          {/* Bottom text */}
+          <div className="flex justify-between mt-3 text-sm">
+            <span className="font-semibold text-primary">{Math.round(pct)}% completado</span>
+            <span className="text-gray-400">Meta: {goal}</span>
           </div>
         </div>
       </div>

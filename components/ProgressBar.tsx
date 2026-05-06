@@ -55,9 +55,8 @@ export default function ProgressBar({ config }: { config: SiteConfig }) {
           </div>
 
           {/* Bottom text */}
-          <div className="flex justify-between mt-3 text-sm">
+          <div className="mt-3 text-sm">
             <span className="font-semibold text-primary">{Math.round(pct)}% completado</span>
-            <span className="text-gray-400">Meta: {goal}</span>
           </div>
         </div>
       </div>

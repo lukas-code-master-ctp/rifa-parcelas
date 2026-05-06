@@ -52,9 +52,8 @@ export default function ParcelaCard({ parcela, progress }: { parcela: Parcela; p
                   style={{ width: `${unlockPct}%` }}
                 />
               </div>
-              <div className="flex justify-between text-xs">
+              <div className="text-xs">
                 <span className="font-semibold text-primary">{Math.round(unlockPct)}% completado</span>
-                <span className="text-gray-400">Meta: {milestone}</span>
               </div>
             </div>
           )}
